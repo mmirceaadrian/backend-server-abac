@@ -31,3 +31,24 @@ def delete_spaceship(spaceship_id: int,
     db.delete(spaceship)
     db.commit()
     return {"message": "Spaceship deleted"}
+
+
+def search_pieces(search_string: str, user_id: int = Depends(auth_handler.auth_wrapper),
+                  db: Session = Depends(get_db)):
+    search_query = "%" + search_string + "%"
+    selected_pieces = db.query(models.Piece).filter(models.Piece.name.like(search_query)).all()
+    result = []
+    for piece in selected_pieces:
+        piece_ddo = {"piece_id": piece.piece_id, "name": piece.name,
+                     "price": piece.price}
+        result.append(piece_ddo)
+    return result
+
+
+def add_piece(name: str, price: int,user_id: int = Depends(auth_handler.auth_wrapper),
+              db: Session = Depends(get_db)):
+    piece = models.Piece(name=name, price=price)
+    db.add(piece)
+    db.commit()
+    db.refresh(piece)
+    return {"message": "Piece added"}

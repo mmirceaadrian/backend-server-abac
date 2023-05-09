@@ -18,3 +18,10 @@ class Spaceship(Base):
     year = Column(Integer)
     image = Column(String)
     user_id = Column(Integer, ForeignKey("user.user_id"))
+
+
+class Piece(Base):
+    __tablename__ = "piece"
+    piece_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    price = Column(Integer)
