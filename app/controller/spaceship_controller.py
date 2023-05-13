@@ -27,3 +27,27 @@ def search_pieces(return_value: dict = Depends(spaceship_service.search_pieces))
 def add_piece(return_value: dict = Depends(spaceship_service.add_piece)):
     """Add a piece to a spaceship"""
     return return_value
+
+
+@spaceship.post("/add_appointment", status_code=201)
+def add_appointment(return_value: dict = Depends(spaceship_service.add_appointment)):
+    """Add an appointment for a spaceship"""
+    return return_value
+
+
+@spaceship.get("/get_appointments", status_code=200)
+def get_appointments(return_value: dict = Depends(spaceship_service.get_appointments)):
+    """Get all appointments for a spaceship"""
+    return return_value
+
+
+@spaceship.post("/add_service", status_code=201)
+def add_service(return_value: dict = Depends(spaceship_service.add_service)):
+    """Add a service for a spaceship"""
+    return return_value
+
+
+@spaceship.get("/get_services", status_code=200)
+def get_services(return_value: dict = Depends(spaceship_service.get_services)):
+    """Get all services for a spaceship"""
+    return return_value
