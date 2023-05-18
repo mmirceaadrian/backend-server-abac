@@ -16,6 +16,10 @@ def get_user_spaceships(return_value: dict = Depends(spaceship_service.get_user_
     """Get all spaceships of a user"""
     return return_value
 
+@spaceship.delete("/delete", status_code=200)
+def delete_spaceship(return_value: dict = Depends(spaceship_service.delete_spaceship)):
+    """Delete a spaceship"""
+    return return_value
 
 @spaceship.get("/search_pieces", status_code=200)
 def search_pieces(return_value: dict = Depends(spaceship_service.search_pieces)):
@@ -51,8 +55,3 @@ def add_service(return_value: dict = Depends(spaceship_service.add_service)):
 def get_services(return_value: dict = Depends(spaceship_service.get_services)):
     """Get all services for a spaceship"""
     return return_value
-
-
-
-
-

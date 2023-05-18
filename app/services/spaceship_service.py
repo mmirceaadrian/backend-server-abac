@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -5,7 +7,22 @@ from app.dataBase import get_db, models
 from app.schema.spaceship_sh import SpaceshipCreateDDO, AppointmentCreateDDO, ServiceCreateDDO
 from app.services.user_service import auth_handler
 import datetime
+import boto3
+from botocore.exceptions import ClientError
 
+bucket_name = os.getenv("BUCKET_NAME")
+
+def get_s3_image_url(image_name: str):
+    s3_client = boto3.client('s3', region_name='us-east-1')
+    try:
+        response = s3_client.generate_presigned_url('get_object',
+                                                    Params={'Bucket': bucket_name,
+                                                            'Key': image_name + ".jfif"},
+                                                    ExpiresIn=3600)
+    except ClientError as e:
+        print(e)
+        return None
+    return response
 
 def add_spaceship(spaceship: SpaceshipCreateDDO,
                   user_id: int = Depends(auth_handler.auth_wrapper),
@@ -20,7 +37,19 @@ def add_spaceship(spaceship: SpaceshipCreateDDO,
 
 def get_user_spaceships(user_id: int = Depends(auth_handler.auth_wrapper),
                         db: Session = Depends(get_db)):
-    return db.query(models.Spaceship).filter_by(user_id=user_id).all()
+    spacehips = db.query(models.Spaceship).all()
+    # get image from amazon s3 bucket, name of image is spaceship_id
+
+
+
+    result = []
+    for spaceship in spacehips:
+        spaceship_ddo = {"spaceship_id": spaceship.spaceship_id, "name": spaceship.name,
+                         "model": spaceship.model, "year": spaceship.year,
+                         "image": get_s3_image_url(str(spaceship.spaceship_id)),
+                         "user_id": spaceship.user_id,}
+        result.append(spaceship_ddo)
+    return result
 
 
 def delete_spaceship(spaceship_id: int,
